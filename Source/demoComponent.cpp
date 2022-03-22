@@ -10,7 +10,8 @@ class DemoBox : public juce::Component
 public:
     DemoBox ()
     {
-        juce::Random r;
+        // juce::Random r;
+        auto& r { juce::Random::getSystemRandom () };
         fFill    = juce::Colour (r.nextFloat (), 0.9f, 0.9f, 0.9f);
         int size = r.nextInt ({ 50, 100 });
         this->setSize (size, size);
