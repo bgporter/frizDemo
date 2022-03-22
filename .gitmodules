@@ -1,0 +1,6 @@
+[submodule "submodules/JUCE"]
+	path = submodules/JUCE
+	url = https://github.com/juce-framework/JUCE
+[submodule "submodules/animator"]
+	path = submodules/animator
+	url = git@github.com:bgporter/animator.git
