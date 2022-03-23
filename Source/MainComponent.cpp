@@ -99,10 +99,10 @@ void MainComponent::OpenPanel ()
     jassert (PanelState::kClosed == fPanelState);
     int width = this->getWidth ();
 
-    int startX = fControls->getX ();
-    int endX   = width - kOpenPanelWidth;
+    const auto startX = static_cast<float>(fControls->getX ());
+    const auto endX   = static_cast<float>(width - kOpenPanelWidth);
 
-    float slew = 0.4;
+    float slew = 0.4f;
 
     using fx = friz::Animation<1>::SourceList;
 
@@ -110,20 +110,20 @@ void MainComponent::OpenPanel ()
     // go 'inward' before popping out, like there's the other part of the spring
     // we bounds against when the panel is closed.
     auto clickIn = std::make_unique<friz::Animation<1>> (
-        fx { std::make_unique<friz::EaseIn> (startX, startX + 10, 0.05f, 0.7f) });
+        fx { std::make_unique<friz::EaseIn> (startX, startX + 10.f, 0.05f, 0.7f) });
 
-    // auto curve = std::make_unique<friz::EaseIn>(startX, endX, 0.5, slew);
     auto popOut = std::make_unique<friz::Animation<1>> (friz::Animation<1>::SourceList {
-        std::make_unique<friz::EaseIn> (startX, endX, 0.4, slew) });
+        std::make_unique<friz::EaseIn> (startX, endX, 0.4f, slew) });
 
     auto animation = std::make_unique<friz::Sequence<1>> ();
     animation->AddAnimation (std::move (clickIn));
     animation->AddAnimation (std::move (popOut));
 
-    animation->OnUpdate ([=] (int id, const friz::Animation<1>::ValueList& val)
-                         { fControls->setTopLeftPosition (val[0], 0); });
+    animation->OnUpdate (
+        [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
+                         { fControls->setTopLeftPosition (static_cast<int>(val[0]), 0); });
 
-    animation->OnCompletion ([=] (int id) { fPanelState = PanelState::kOpen; });
+    animation->OnCompletion ([=] (int /*id*/) { fPanelState = PanelState::kOpen; });
 
     fPanelState = PanelState::kOpening;
     fPanelAnimator.AddAnimation (std::move (animation));
@@ -134,20 +134,21 @@ void MainComponent::ClosePanel ()
     jassert (PanelState::kOpen == fPanelState);
     int width = this->getWidth ();
 
-    int startX = fControls->getX ();
-    int endX   = width - kClosedPanelWidth;
+    const auto startX = static_cast<float>(fControls->getX ());
+    const auto endX   = static_cast<float>(width - kClosedPanelWidth);
 
     float accel  = 1.4f;
     float dampen = 0.4f;
 
-    auto curve     = std::make_unique<friz::Spring> (startX, endX, 0.5, accel, dampen);
+    auto curve     = std::make_unique<friz::Spring> (startX, endX, 0.5f, accel, dampen);
     auto animation = std::make_unique<friz::Animation<1>> (
         friz::Animation<1>::SourceList { std::move (curve) }, 0);
 
-    animation->OnUpdate ([=] (int id, const friz::Animation<1>::ValueList& val)
-                         { fControls->setTopLeftPosition (val[0], 0); });
+    animation->OnUpdate (
+        [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
+                         { fControls->setTopLeftPosition (static_cast<int>(val[0]), 0); });
 
-    animation->OnCompletion ([=] (int id) { fPanelState = PanelState::kClosed; });
+    animation->OnCompletion ([=] (int /*id*/) { fPanelState = PanelState::kClosed; });
 
     fPanelState = PanelState::kClosing;
     fPanelAnimator.AddAnimation (std::move (animation));

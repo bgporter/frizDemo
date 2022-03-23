@@ -135,10 +135,10 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
     box->setBounds (startPoint.x, startPoint.y, box->getWidth (), box->getHeight ());
 
     // set the animation parameters.
-    int startX = startPoint.x;
-    int endX   = r.nextInt ({ 0, this->getWidth () - box->getWidth () });
-    int startY = startPoint.y;
-    int endY   = r.nextInt ({ 0, this->getHeight () - box->getHeight () });
+    auto startX = static_cast<float>(startPoint.x);
+    auto endX   = static_cast<float>(r.nextInt ({ 0, this->getWidth () - box->getWidth () }));
+    auto startY = static_cast<float>(startPoint.y);
+    auto endY   = static_cast<float>(r.nextInt ({ 0, this->getHeight () - box->getHeight () }));
 
     auto movement = std::make_unique<friz::Animation<2>> (++fNextEffectId);
 
@@ -244,16 +244,18 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
 
     // On each update: move this box to the next position on the (x,y) curve.
     movement->OnUpdate (
-        [=] (int id, const friz::Animation<2>::ValueList& val)
+        [=] (int /*id*/, const friz::Animation<2>::ValueList& val)
         {
-            box->setTopLeftPosition (val[kXpos], val[kYpos]);
+            const auto x { static_cast<int> (val[kXpos]) };
+            const auto y { static_cast<int> (val[kYpos]) };
+            box->setTopLeftPosition (x, y);
             fBreadcrumbs.AddPoint (val[kXpos], val[kYpos]);
         });
 
     // When the main animation completes: start a second animation that slowly
     // fades the color all the way out.
     movement->OnCompletion (
-        [=] (int id)
+        [=] (int /*id*/)
         {
             float currentSat = box->GetSaturation ();
 
@@ -269,14 +271,14 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
             fade->SetDelay (delay);
 
             fade->OnUpdate (
-                [=] (int id, const friz::Animation<1>::ValueList& val)
+                [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
                 {
                     // every update, change the saturation value of the color.
                     box->SetSaturation (val[0]);
                 });
 
             fade->OnCompletion (
-                [=] (int id)
+                [=] (int /*id*/)
                 {
                     // ...and when the fade animation is complete, delete the box from the
                     // demo component.
