@@ -31,7 +31,7 @@ void ControlPanel::resized ()
     fControls.setBounds (bounds);
 }
 
-void ControlPanel::mouseDown (const juce::MouseEvent& e)
+void ControlPanel::mouseDown (const juce::MouseEvent& /*e*/)
 {
     this->sendChangeMessage ();
 }
@@ -61,7 +61,7 @@ void VtSlider::resized ()
     fSlider->setBounds (this->getLocalBounds ());
 }
 
-void VtSlider::sliderValueChanged (juce::Slider* s)
+void VtSlider::sliderValueChanged (juce::Slider* /*s*/)
 {
     if (fIsInt)
     {
@@ -95,7 +95,7 @@ void VtCheck::resized ()
     fButton->setBounds (this->getLocalBounds ());
 }
 
-void VtCheck::buttonClicked (juce::Button* b)
+void VtCheck::buttonClicked (juce::Button* /*b*/)
 {
     fTree.setProperty (fParam, fButton->getToggleState (), nullptr);
 }
@@ -204,7 +204,7 @@ ControlWell::ControlWell (juce::ValueTree params)
     AddControl (std::move (combo));
 
     AddControl (std::make_unique<VtLabel> (false, "Effect Duration"));
-    AddControl (std::make_unique<VtSlider> (fTree, 10, 50 * 5, true, ID::kDuration));
+    AddControl (std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kDuration));
 
     AddControl (std::make_unique<VtLabel> (true, "Ease In - [alt+click]"));
     AddControl (std::make_unique<VtLabel> (false, "X Tolerance"));
@@ -254,9 +254,9 @@ ControlWell::ControlWell (juce::ValueTree params)
 
     AddControl (std::make_unique<VtLabel> (true, "Fade"));
     AddControl (std::make_unique<VtLabel> (false, "Fade Delay"));
-    AddControl (std::make_unique<VtSlider> (fTree, 0, 50 * 5, true, ID::kFadeDelay));
+    AddControl (std::make_unique<VtSlider> (fTree, 0.f, 50 * 5.f, true, ID::kFadeDelay));
     AddControl (std::make_unique<VtLabel> (false, "Fade Duration"));
-    AddControl (std::make_unique<VtSlider> (fTree, 10, 50 * 5, true, ID::kFadeDuration));
+    AddControl (std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kFadeDuration));
 }
 
 void ControlWell::AddControl (std::unique_ptr<Component> control)
