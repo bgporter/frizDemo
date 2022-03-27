@@ -57,15 +57,7 @@ DemoComponent::~DemoComponent ()
 
 void DemoComponent::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
     g.fillAll (juce::Colours::lightgrey);
-
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds (), 1); // draw an outline around the component
 }
@@ -77,7 +69,7 @@ void DemoComponent::resized ()
 
 void DemoComponent::Clear ()
 {
-    fAnimator.CancelAllAnimations (false);
+    fAnimator.cancelAllAnimations (false);
     fBoxList.clear ();
     fBreadcrumbs.Clear ();
     this->repaint ();
@@ -119,7 +111,7 @@ void DemoComponent::mouseDown (const juce::MouseEvent& e)
 
 void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
 {
-    juce::Random r;
+    auto& r { juce::Random::getSystemRandom () };
 
     bool enableCrumbs = fParams.getProperty (ID::kBreadcrumbs);
     if (enableCrumbs != fBreadcrumbs.IsEnabled ())
@@ -135,10 +127,12 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
     box->setBounds (startPoint.x, startPoint.y, box->getWidth (), box->getHeight ());
 
     // set the animation parameters.
-    auto startX = static_cast<float>(startPoint.x);
-    auto endX   = static_cast<float>(r.nextInt ({ 0, this->getWidth () - box->getWidth () }));
-    auto startY = static_cast<float>(startPoint.y);
-    auto endY   = static_cast<float>(r.nextInt ({ 0, this->getHeight () - box->getHeight () }));
+    auto startX = static_cast<float> (startPoint.x);
+    auto endX =
+        static_cast<float> (r.nextInt ({ 0, this->getWidth () - box->getWidth () }));
+    auto startY = static_cast<float> (startPoint.y);
+    auto endY =
+        static_cast<float> (r.nextInt ({ 0, this->getHeight () - box->getHeight () }));
 
     auto movement = std::make_unique<friz::Animation<2>> (++fNextEffectId);
 
@@ -227,8 +221,8 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
             friz::Animation<2>::SourceList { std::move (xCurve2), std::move (yCurve2) });
         //
         auto sequence = std::make_unique<friz::Sequence<2>> (++fNextEffectId);
-        sequence->AddAnimation (std::move (effect1));
-        sequence->AddAnimation (std::move (effect2));
+        sequence->addAnimation (std::move (effect1));
+        sequence->addAnimation (std::move (effect2));
 
         movement = std::move (sequence);
     }
@@ -238,12 +232,12 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
 
     if (EffectType::kInOut != type)
     {
-        movement->SetValue (kXpos, std::move (xCurve));
-        movement->SetValue (kYpos, std::move (yCurve));
+        movement->setValue (kXpos, std::move (xCurve));
+        movement->setValue (kYpos, std::move (yCurve));
     }
 
     // On each update: move this box to the next position on the (x,y) curve.
-    movement->OnUpdate (
+    movement->onUpdate (
         [=] (int /*id*/, const friz::Animation<2>::ValueList& val)
         {
             const auto x { static_cast<int> (val[kXpos]) };
@@ -254,7 +248,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
 
     // When the main animation completes: start a second animation that slowly
     // fades the color all the way out.
-    movement->OnCompletion (
+    movement->onCompletion (
         [=] (int /*id*/)
         {
             float currentSat = box->GetSaturation ();
@@ -268,16 +262,16 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
                 ++fNextEffectId);
 
             // don't start fading until `delay` frames have elapsed
-            fade->SetDelay (delay);
+            fade->setDelay (delay);
 
-            fade->OnUpdate (
+            fade->onUpdate (
                 [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
                 {
                     // every update, change the saturation value of the color.
                     box->SetSaturation (val[0]);
                 });
 
-            fade->OnCompletion (
+            fade->onCompletion (
                 [=] (int /*id*/)
                 {
                     // ...and when the fade animation is complete, delete the box from the
@@ -286,10 +280,10 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
                     this->DeleteBox (box);
                 });
 
-            fAnimator.AddAnimation (std::move (fade));
+            fAnimator.addAnimation (std::move (fade));
         });
 
-    fAnimator.AddAnimation (std::move (movement));
+    fAnimator.addAnimation (std::move (movement));
 
     fBoxList.emplace_back (box);
 }
