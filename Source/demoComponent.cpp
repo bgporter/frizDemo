@@ -14,13 +14,13 @@ public:
         auto& r { juce::Random::getSystemRandom () };
         fFill    = juce::Colour (r.nextFloat (), 0.9f, 0.9f, 0.9f);
         int size = r.nextInt ({ 50, 100 });
-        this->setSize (size, size);
+        setSize (size, size);
     }
 
     void paint (juce::Graphics& g) override
     {
         g.fillAll (fFill);
-        auto bounds = this->getLocalBounds ();
+        auto bounds = getLocalBounds ();
         g.setColour (juce::Colours::black);
         g.drawRect (bounds, 4);
     }
@@ -30,7 +30,7 @@ public:
     void SetSaturation (float newSaturation)
     {
         fFill = fFill.withSaturation (newSaturation);
-        this->repaint ();
+        repaint ();
     }
 
 public:
@@ -46,13 +46,13 @@ DemoComponent::DemoComponent (juce::ValueTree params)
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-    this->addAndMakeVisible (fBreadcrumbs);
+    addAndMakeVisible (fBreadcrumbs);
     fBreadcrumbs.toBack ();
 }
 
 DemoComponent::~DemoComponent ()
 {
-    this->Clear ();
+    Clear ();
 }
 
 void DemoComponent::paint (juce::Graphics& g)
@@ -64,7 +64,7 @@ void DemoComponent::paint (juce::Graphics& g)
 
 void DemoComponent::resized ()
 {
-    fBreadcrumbs.setBounds (this->getLocalBounds ());
+    fBreadcrumbs.setBounds (getLocalBounds ());
 }
 
 void DemoComponent::Clear ()
@@ -72,14 +72,14 @@ void DemoComponent::Clear ()
     fAnimator.cancelAllAnimations (false);
     fBoxList.clear ();
     fBreadcrumbs.Clear ();
-    this->repaint ();
+    repaint ();
 }
 
 void DemoComponent::mouseDown (const juce::MouseEvent& e)
 {
     if (e.mods.isPopupMenu ())
     {
-        this->Clear ();
+        Clear ();
     }
     else
     {
@@ -105,7 +105,7 @@ void DemoComponent::mouseDown (const juce::MouseEvent& e)
             type = EffectType::kSpring;
         }
 
-        this->CreateDemo (e.getPosition (), type);
+        CreateDemo (e.getPosition (), type);
     }
 }
 
@@ -120,19 +120,17 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
     }
 
     fBreadcrumbs.Clear ();
-    this->repaint ();
+    repaint ();
 
     auto box = new DemoBox ();
-    this->addAndMakeVisible (box);
+    addAndMakeVisible (box);
     box->setBounds (startPoint.x, startPoint.y, box->getWidth (), box->getHeight ());
 
     // set the animation parameters.
     auto startX = static_cast<float> (startPoint.x);
-    auto endX =
-        static_cast<float> (r.nextInt ({ 0, this->getWidth () - box->getWidth () }));
+    auto endX   = static_cast<float> (r.nextInt ({ 0, getWidth () - box->getWidth () }));
     auto startY = static_cast<float> (startPoint.y);
-    auto endY =
-        static_cast<float> (r.nextInt ({ 0, this->getHeight () - box->getHeight () }));
+    auto endY = static_cast<float> (r.nextInt ({ 0, getHeight () - box->getHeight () }));
 
     auto movement = std::make_unique<friz::Animation<2>> (++fNextEffectId);
 
@@ -253,8 +251,8 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
         {
             float currentSat = box->GetSaturation ();
 
-            int delay = this->fParams.getProperty (ID::kFadeDelay);
-            int dur   = this->fParams.getProperty (ID::kFadeDuration);
+            int delay = fParams.getProperty (ID::kFadeDelay);
+            int dur   = fParams.getProperty (ID::kFadeDuration);
 
             auto fade = std::make_unique<friz::Animation<1>> (
                 friz::Animation<1>::SourceList {
@@ -277,7 +275,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
                     // ...and when the fade animation is complete, delete the box from the
                     // demo component.
                     // DBG("Completing # " << id);
-                    this->DeleteBox (box);
+                    DeleteBox (box);
                 });
 
             fAnimator.addAnimation (std::move (fade));

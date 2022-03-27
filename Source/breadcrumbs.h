@@ -13,12 +13,12 @@ public:
     : fEnabled (true)
     {
         // ignore all mouse clicks.
-        this->setInterceptsMouseClicks (false, false);
+        setInterceptsMouseClicks (false, false);
     }
 
     void Enable (bool isEnabled)
     {
-        this->Clear ();
+        Clear ();
         fEnabled = isEnabled;
     }
 

@@ -37,11 +37,11 @@ MainComponent::MainComponent ()
 
     DBG (fParams.toXmlString ());
 
-    this->addAndMakeVisible (fStage);
+    addAndMakeVisible (fStage);
 
     fControls.reset (new ControlPanel (fParams));
 
-    this->addAndMakeVisible (fControls.get ());
+    addAndMakeVisible (fControls.get ());
     fControls->addChangeListener (this);
     setSize (1000, 740);
 }
@@ -62,7 +62,7 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized ()
 {
-    auto bounds = this->getLocalBounds ();
+    auto bounds = getLocalBounds ();
     fStage.setBounds (bounds);
 
     if (fPanelState != PanelState::kClosing || fPanelState != kOpening)
@@ -84,11 +84,11 @@ void MainComponent::changeListenerCallback (juce::ChangeBroadcaster* src)
         // user clicked on panel -- open or close it.
         if (PanelState::kOpen == fPanelState)
         {
-            this->ClosePanel ();
+            ClosePanel ();
         }
         else if (PanelState::kClosed == fPanelState)
         {
-            this->OpenPanel ();
+            OpenPanel ();
         }
         // else, we're already in motion, do nothing.
     }
@@ -97,7 +97,7 @@ void MainComponent::changeListenerCallback (juce::ChangeBroadcaster* src)
 void MainComponent::OpenPanel ()
 {
     jassert (PanelState::kClosed == fPanelState);
-    int width = this->getWidth ();
+    int width = getWidth ();
 
     const auto startX = static_cast<float> (fControls->getX ());
     const auto endX   = static_cast<float> (width - kOpenPanelWidth);
@@ -132,7 +132,7 @@ void MainComponent::OpenPanel ()
 void MainComponent::ClosePanel ()
 {
     jassert (PanelState::kOpen == fPanelState);
-    int width = this->getWidth ();
+    int width = getWidth ();
 
     const auto startX = static_cast<float> (fControls->getX ());
     const auto endX   = static_cast<float> (width - kClosedPanelWidth);

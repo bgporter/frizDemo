@@ -8,7 +8,7 @@
 ControlPanel::ControlPanel (juce::ValueTree params)
 : fControls (params)
 {
-    this->addAndMakeVisible (fControls);
+    addAndMakeVisible (fControls);
 }
 
 ControlPanel::~ControlPanel () {}
@@ -26,14 +26,14 @@ void ControlPanel::resized ()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-    auto bounds = this->getLocalBounds ();
+    auto bounds = getLocalBounds ();
     bounds.removeFromLeft (30);
     fControls.setBounds (bounds);
 }
 
 void ControlPanel::mouseDown (const juce::MouseEvent& /*e*/)
 {
-    this->sendChangeMessage ();
+    sendChangeMessage ();
 }
 
 VtSlider::VtSlider (juce::ValueTree tree, float min, float max, bool isInt,
@@ -43,7 +43,7 @@ VtSlider::VtSlider (juce::ValueTree tree, float min, float max, bool isInt,
 , fIsInt (isInt)
 {
     fSlider.reset (new juce::Slider (param.toString ()));
-    this->addAndMakeVisible (fSlider.get ());
+    addAndMakeVisible (fSlider.get ());
     fSlider->setRange (min, max, isInt ? 1 : 0);
     fSlider->setSliderStyle (juce::Slider::LinearHorizontal);
     fSlider->setNumDecimalPlacesToDisplay (3);
@@ -53,12 +53,12 @@ VtSlider::VtSlider (juce::ValueTree tree, float min, float max, bool isInt,
     float val = fTree.getProperty (param);
 
     fSlider->setValue (val, juce::NotificationType::dontSendNotification);
-    this->setSize (190, 24);
+    setSize (190, 24);
 }
 
 void VtSlider::resized ()
 {
-    fSlider->setBounds (this->getLocalBounds ());
+    fSlider->setBounds (getLocalBounds ());
 }
 
 void VtSlider::sliderValueChanged (juce::Slider* /*s*/)
@@ -79,7 +79,7 @@ VtCheck::VtCheck (juce::ValueTree tree, juce::Identifier param, juce::StringRef 
 , fParam (param)
 {
     fButton.reset (new juce::ToggleButton (param.toString ()));
-    this->addAndMakeVisible (fButton.get ());
+    addAndMakeVisible (fButton.get ());
     fButton->setButtonText (label);
     fButton->addListener (this);
 
@@ -87,12 +87,12 @@ VtCheck::VtCheck (juce::ValueTree tree, juce::Identifier param, juce::StringRef 
 
     fButton->setToggleState (isSet, juce::NotificationType::dontSendNotification);
 
-    this->setSize (190, 24);
+    setSize (190, 24);
 }
 
 void VtCheck::resized ()
 {
-    fButton->setBounds (this->getLocalBounds ());
+    fButton->setBounds (getLocalBounds ());
 }
 
 void VtCheck::buttonClicked (juce::Button* /*b*/)
@@ -105,15 +105,15 @@ VtComboBox::VtComboBox (juce::ValueTree tree, juce::Identifier param)
 , fParam (param)
 {
     fCombo = std::make_unique<juce::ComboBox> (param.toString ());
-    this->addAndMakeVisible (fCombo.get ());
+    addAndMakeVisible (fCombo.get ());
     fCombo->addListener (this);
     fCombo->setColour (juce::ComboBox::backgroundColourId, juce::Colour (0x00000000));
-    this->setSize (190, 24);
+    setSize (190, 24);
 }
 
 void VtComboBox::resized ()
 {
-    fCombo->setBounds (this->getLocalBounds ());
+    fCombo->setBounds (getLocalBounds ());
 }
 
 void VtComboBox::comboBoxChanged (juce::ComboBox*)
@@ -142,7 +142,7 @@ public:
     VtLabel (bool large, juce::StringRef text)
     {
         fLabel.reset (new juce::Label (text, text));
-        this->addAndMakeVisible (fLabel.get ());
+        addAndMakeVisible (fLabel.get ());
         float fontSize = large ? 15.f : 10.f;
         fLabel->setFont (
             juce::Font (fontSize, juce::Font::plain).withTypefaceStyle ("Regular"));
@@ -152,10 +152,10 @@ public:
         fLabel->setColour (juce::TextEditor::backgroundColourId,
                            juce::Colour (0x00000000));
 
-        this->setSize (190, large ? 24 : 12);
+        setSize (190, large ? 24 : 12);
     }
 
-    void resized () override { fLabel->setBounds (this->getLocalBounds ()); }
+    void resized () override { fLabel->setBounds (getLocalBounds ()); }
 
 private:
     std::unique_ptr<juce::Label> fLabel;
@@ -256,20 +256,20 @@ ControlWell::ControlWell (juce::ValueTree params)
     AddControl (std::make_unique<VtLabel> (false, "Fade Delay"));
     AddControl (std::make_unique<VtSlider> (fTree, 0.f, 50 * 5.f, true, ID::kFadeDelay));
     AddControl (std::make_unique<VtLabel> (false, "Fade Duration"));
-    AddControl (std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kFadeDuration));
+    AddControl (
+        std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kFadeDuration));
 }
 
 void ControlWell::AddControl (std::unique_ptr<Component> control)
 {
-    this->addAndMakeVisible (control.get ());
+    addAndMakeVisible (control.get ());
     fControls.push_back (std::move (control));
 }
 
 void ControlWell::resized ()
 {
     int yPos { 0 };
-    int w = this->getWidth ();
-    // int h = this->getHeight();
+    int w = getWidth ();
 
     for (auto& c : fControls)
     {
