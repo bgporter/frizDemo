@@ -36,12 +36,12 @@ public:
 
     void mouseDown (const juce::MouseEvent& e) override;
 
-    void CreateDemo (juce::Point<int> startPoint, EffectType type);
+    void createDemo (juce::Point<int> startPoint, EffectType type);
 
-    void Clear ();
+    void clear ();
 
 private:
-    void DeleteBox (DemoBox* box);
+    void deleteBox (DemoBox* box);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DemoComponent)

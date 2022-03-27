@@ -35,8 +35,6 @@ MainComponent::MainComponent ()
     fParams.setProperty (ID::kFadeDelay, 50, nullptr);
     fParams.setProperty (ID::kFadeDuration, 150, nullptr);
 
-    DBG (fParams.toXmlString ());
-
     addAndMakeVisible (fStage);
 
     fControls.reset (new ControlPanel (fParams));
@@ -62,7 +60,7 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized ()
 {
-    auto bounds = getLocalBounds ();
+    const auto bounds = getLocalBounds ();
     fStage.setBounds (bounds);
 
     if (fPanelState != PanelState::kClosing || fPanelState != kOpening)
@@ -84,17 +82,17 @@ void MainComponent::changeListenerCallback (juce::ChangeBroadcaster* src)
         // user clicked on panel -- open or close it.
         if (PanelState::kOpen == fPanelState)
         {
-            ClosePanel ();
+            closePanel ();
         }
         else if (PanelState::kClosed == fPanelState)
         {
-            OpenPanel ();
+            openPanel ();
         }
         // else, we're already in motion, do nothing.
     }
 }
 
-void MainComponent::OpenPanel ()
+void MainComponent::openPanel ()
 {
     jassert (PanelState::kClosed == fPanelState);
     int width = getWidth ();
@@ -129,7 +127,7 @@ void MainComponent::OpenPanel ()
     fPanelAnimator.addAnimation (std::move (animation));
 }
 
-void MainComponent::ClosePanel ()
+void MainComponent::closePanel ()
 {
     jassert (PanelState::kOpen == fPanelState);
     int width = getWidth ();

@@ -125,12 +125,12 @@ void VtComboBox::comboBoxChanged (juce::ComboBox*)
     }
 }
 
-void VtComboBox::AddSelection (int itemId, juce::StringRef label)
+void VtComboBox::addSelection (int itemId, juce::StringRef label)
 {
     fCombo->addItem (label, itemId + 1);
 }
 
-void VtComboBox::Update ()
+void VtComboBox::update ()
 {
     int index = fTree.getProperty (fParam);
     fCombo->setSelectedId (index + 1, juce::NotificationType::dontSendNotification);
@@ -164,103 +164,103 @@ private:
 ControlWell::ControlWell (juce::ValueTree params)
 : fTree (params)
 {
-    AddControl (std::make_unique<VtCheck> (fTree, ID::kBreadcrumbs, "Show Breadcrumbs"));
-    AddControl (std::make_unique<VtLabel> (true, "Parametric - [click]"));
-    AddControl (std::make_unique<VtLabel> (false, "Curve"));
+    addControl (std::make_unique<VtCheck> (fTree, ID::kBreadcrumbs, "Show Breadcrumbs"));
+    addControl (std::make_unique<VtLabel> (true, "Parametric - [click]"));
+    addControl (std::make_unique<VtLabel> (false, "Curve"));
 
     auto combo { std::make_unique<VtComboBox> (fTree, ID::kCurve) };
-    combo->AddSelection (friz::Parametric::kLinear, "Linear");
-    combo->AddSelection (friz::Parametric::kEaseInSine, "Sine (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutSine, "Sine (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutSine, "Sine (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInQuad, "Quad (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutQuad, "Quad (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutQuad, "Quad (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInCubic, "Cubic (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutCubic, "Cubic (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutCubic, "Cubic (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInQuartic, "Quartic (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutQuartic, "Quartic (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutQuartic, "Quartic (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInQuintic, "Quintic (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutQuintic, "Quintic (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutQuintic, "Quintic (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInExpo, "Exponential (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutExpo, "Exponential (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutExpo, "Exponential (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInCirc, "Circular (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutCirc, "Circular (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutCirc, "Circular (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInBack, "Back (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutBack, "Back (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutBack, "Back (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInElastic, "Elastic (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutElastic, "Elastic (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutElastic, "Elastic (in/out)");
-    combo->AddSelection (friz::Parametric::kEaseInBounce, "Bounce (ease in)");
-    combo->AddSelection (friz::Parametric::kEaseOutBounce, "Bounce (ease out)");
-    combo->AddSelection (friz::Parametric::kEaseInOutBounce, "Bounce (in/out)");
-    combo->Update (); // set the combo box to the current selection.
-    AddControl (std::move (combo));
+    combo->addSelection (friz::Parametric::kLinear, "Linear");
+    combo->addSelection (friz::Parametric::kEaseInSine, "Sine (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutSine, "Sine (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutSine, "Sine (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInQuad, "Quad (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutQuad, "Quad (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutQuad, "Quad (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInCubic, "Cubic (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutCubic, "Cubic (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutCubic, "Cubic (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInQuartic, "Quartic (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutQuartic, "Quartic (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutQuartic, "Quartic (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInQuintic, "Quintic (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutQuintic, "Quintic (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutQuintic, "Quintic (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInExpo, "Exponential (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutExpo, "Exponential (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutExpo, "Exponential (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInCirc, "Circular (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutCirc, "Circular (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutCirc, "Circular (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInBack, "Back (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutBack, "Back (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutBack, "Back (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInElastic, "Elastic (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutElastic, "Elastic (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutElastic, "Elastic (in/out)");
+    combo->addSelection (friz::Parametric::kEaseInBounce, "Bounce (ease in)");
+    combo->addSelection (friz::Parametric::kEaseOutBounce, "Bounce (ease out)");
+    combo->addSelection (friz::Parametric::kEaseInOutBounce, "Bounce (in/out)");
+    combo->update (); // set the combo box to the current selection.
+    addControl (std::move (combo));
 
-    AddControl (std::make_unique<VtLabel> (false, "Effect Duration"));
-    AddControl (std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kDuration));
+    addControl (std::make_unique<VtLabel> (false, "Effect Duration"));
+    addControl (std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kDuration));
 
-    AddControl (std::make_unique<VtLabel> (true, "Ease In - [alt+click]"));
-    AddControl (std::make_unique<VtLabel> (false, "X Tolerance"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (true, "Ease In - [alt+click]"));
+    addControl (std::make_unique<VtLabel> (false, "X Tolerance"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kEaseInToleranceX));
-    AddControl (std::make_unique<VtLabel> (false, "X Slew"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "X Slew"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kEaseInSlewX));
-    AddControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kEaseInToleranceY));
-    AddControl (std::make_unique<VtLabel> (false, "Y Slew"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "Y Slew"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kEaseInSlewY));
 
-    AddControl (std::make_unique<VtLabel> (true, "Ease Out - [shift+click]"));
-    AddControl (std::make_unique<VtLabel> (false, "X Tolerance"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (true, "Ease Out - [shift+click]"));
+    addControl (std::make_unique<VtLabel> (false, "X Tolerance"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kEaseOutToleranceX));
-    AddControl (std::make_unique<VtLabel> (false, "X Slew"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "X Slew"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 1.01f, 1.99f, false, ID::kEaseOutSlewX));
-    AddControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kEaseOutToleranceY));
-    AddControl (std::make_unique<VtLabel> (false, "Y Slew"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "Y Slew"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 1.01f, 1.99f, false, ID::kEaseOutSlewY));
 
 #if JUCE_MAC
-    AddControl (std::make_unique<VtLabel> (true, "Spring - [cmd+click]"));
+    addControl (std::make_unique<VtLabel> (true, "Spring - [cmd+click]"));
 #else
-    AddControl (std::make_unique<VtLabel> (true, "Spring - [ctrl+click]"));
+    addControl (std::make_unique<VtLabel> (true, "Spring - [ctrl+click]"));
 #endif
-    AddControl (std::make_unique<VtLabel> (false, "X Tolerance"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "X Tolerance"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kSpringToleranceX));
-    AddControl (std::make_unique<VtLabel> (false, "X Damping"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "X Damping"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kSpringDampingX));
-    AddControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kSpringToleranceY));
-    AddControl (std::make_unique<VtLabel> (false, "Y Damping"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (false, "Y Damping"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kSpringDampingY));
 
-    AddControl (std::make_unique<VtLabel> (true, "Fade"));
-    AddControl (std::make_unique<VtLabel> (false, "Fade Delay"));
-    AddControl (std::make_unique<VtSlider> (fTree, 0.f, 50 * 5.f, true, ID::kFadeDelay));
-    AddControl (std::make_unique<VtLabel> (false, "Fade Duration"));
-    AddControl (
+    addControl (std::make_unique<VtLabel> (true, "Fade"));
+    addControl (std::make_unique<VtLabel> (false, "Fade Delay"));
+    addControl (std::make_unique<VtSlider> (fTree, 0.f, 50 * 5.f, true, ID::kFadeDelay));
+    addControl (std::make_unique<VtLabel> (false, "Fade Duration"));
+    addControl (
         std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kFadeDuration));
 }
 
-void ControlWell::AddControl (std::unique_ptr<Component> control)
+void ControlWell::addControl (std::unique_ptr<Component> control)
 {
     addAndMakeVisible (control.get ());
     fControls.push_back (std::move (control));

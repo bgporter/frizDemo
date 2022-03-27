@@ -20,14 +20,14 @@ public:
     void paint (juce::Graphics& g) override
     {
         g.fillAll (fFill);
-        auto bounds = getLocalBounds ();
+        const auto bounds = getLocalBounds ();
         g.setColour (juce::Colours::black);
         g.drawRect (bounds, 4);
     }
 
-    float GetSaturation () const { return fFill.getSaturation (); }
+    float getSaturation () const { return fFill.getSaturation (); }
 
-    void SetSaturation (float newSaturation)
+    void setSaturation (float newSaturation)
     {
         fFill = fFill.withSaturation (newSaturation);
         repaint ();
@@ -52,7 +52,7 @@ DemoComponent::DemoComponent (juce::ValueTree params)
 
 DemoComponent::~DemoComponent ()
 {
-    Clear ();
+    clear ();
 }
 
 void DemoComponent::paint (juce::Graphics& g)
@@ -67,11 +67,11 @@ void DemoComponent::resized ()
     fBreadcrumbs.setBounds (getLocalBounds ());
 }
 
-void DemoComponent::Clear ()
+void DemoComponent::clear ()
 {
     fAnimator.cancelAllAnimations (false);
     fBoxList.clear ();
-    fBreadcrumbs.Clear ();
+    fBreadcrumbs.clear ();
     repaint ();
 }
 
@@ -79,7 +79,7 @@ void DemoComponent::mouseDown (const juce::MouseEvent& e)
 {
     if (e.mods.isPopupMenu ())
     {
-        Clear ();
+        clear ();
     }
     else
     {
@@ -105,21 +105,21 @@ void DemoComponent::mouseDown (const juce::MouseEvent& e)
             type = EffectType::kSpring;
         }
 
-        CreateDemo (e.getPosition (), type);
+        createDemo (e.getPosition (), type);
     }
 }
 
-void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
+void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
 {
     auto& r { juce::Random::getSystemRandom () };
 
     bool enableCrumbs = fParams.getProperty (ID::kBreadcrumbs);
-    if (enableCrumbs != fBreadcrumbs.IsEnabled ())
+    if (enableCrumbs != fBreadcrumbs.isEnabled ())
     {
-        fBreadcrumbs.Enable (enableCrumbs);
+        fBreadcrumbs.enable (enableCrumbs);
     }
 
-    fBreadcrumbs.Clear ();
+    fBreadcrumbs.clear ();
     repaint ();
 
     auto box = new DemoBox ();
@@ -241,7 +241,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
             const auto x { static_cast<int> (val[kXpos]) };
             const auto y { static_cast<int> (val[kYpos]) };
             box->setTopLeftPosition (x, y);
-            fBreadcrumbs.AddPoint (val[kXpos], val[kYpos]);
+            fBreadcrumbs.addPoint (val[kXpos], val[kYpos]);
         });
 
     // When the main animation completes: start a second animation that slowly
@@ -249,7 +249,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
     movement->onCompletion (
         [=] (int /*id*/)
         {
-            float currentSat = box->GetSaturation ();
+            float currentSat = box->getSaturation ();
 
             int delay = fParams.getProperty (ID::kFadeDelay);
             int dur   = fParams.getProperty (ID::kFadeDuration);
@@ -266,7 +266,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
                 [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
                 {
                     // every update, change the saturation value of the color.
-                    box->SetSaturation (val[0]);
+                    box->setSaturation (val[0]);
                 });
 
             fade->onCompletion (
@@ -274,8 +274,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
                 {
                     // ...and when the fade animation is complete, delete the box from the
                     // demo component.
-                    // DBG("Completing # " << id);
-                    DeleteBox (box);
+                    this->deleteBox (box);
                 });
 
             fAnimator.addAnimation (std::move (fade));
@@ -286,7 +285,7 @@ void DemoComponent::CreateDemo (juce::Point<int> startPoint, EffectType type)
     fBoxList.emplace_back (box);
 }
 
-void DemoComponent::DeleteBox (DemoBox* box)
+void DemoComponent::deleteBox (DemoBox* box)
 {
     fBoxList.erase (std::remove_if (fBoxList.begin (), fBoxList.end (),
                                     [&] (const std::unique_ptr<DemoBox>& b)

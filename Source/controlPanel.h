@@ -6,9 +6,8 @@
 
 #include "animatorApp.h"
 
-class VtSlider
-: public juce::Component
-, public juce::Slider::Listener
+class VtSlider : public juce::Component,
+                 public juce::Slider::Listener
 {
 public:
     VtSlider (juce::ValueTree tree, float min, float max, bool isInt,
@@ -25,9 +24,8 @@ private:
     bool fIsInt;
 };
 
-class VtCheck
-: public juce::Component
-, public juce::Button::Listener
+class VtCheck : public juce::Component,
+                public juce::Button::Listener
 {
 public:
     VtCheck (juce::ValueTree tree, juce::Identifier param, juce::StringRef label);
@@ -42,9 +40,8 @@ private:
     juce::Identifier fParam;
 };
 
-class VtComboBox
-: public juce::Component
-, public juce::ComboBox::Listener
+class VtComboBox : public juce::Component,
+                   public juce::ComboBox::Listener
 {
 public:
     VtComboBox (juce::ValueTree tree, juce::Identifier param);
@@ -53,9 +50,9 @@ public:
 
     void comboBoxChanged (juce::ComboBox*) override;
 
-    void AddSelection (int itemId, juce::StringRef label);
+    void addSelection (int itemId, juce::StringRef label);
 
-    void Update ();
+    void update ();
 
 private:
     std::unique_ptr<juce::ComboBox> fCombo;
@@ -73,16 +70,15 @@ public:
     void paint (juce::Graphics& g) override;
 
 private:
-    void AddControl (std::unique_ptr<juce::Component> control);
+    void addControl (std::unique_ptr<juce::Component> control);
 
 private:
     juce::ValueTree fTree;
     std::vector<std::unique_ptr<juce::Component>> fControls;
 };
 
-class ControlPanel
-: public juce::Component
-, public juce::ChangeBroadcaster
+class ControlPanel : public juce::Component,
+                     public juce::ChangeBroadcaster
 {
 public:
     ControlPanel (juce::ValueTree params);

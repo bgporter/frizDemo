@@ -16,17 +16,17 @@ public:
         setInterceptsMouseClicks (false, false);
     }
 
-    void Enable (bool isEnabled)
+    void enable (bool isEnabled)
     {
-        Clear ();
+        clear ();
         fEnabled = isEnabled;
     }
 
-    bool IsEnabled () const { return fEnabled; }
+    bool isEnabled () const { return fEnabled; }
 
-    void Clear () { fBreadcrumbs.clear (); }
+    void clear () { fBreadcrumbs.clear (); }
 
-    void AddPoint (float x, float y)
+    void addPoint (float x, float y)
     {
         if (fEnabled)
         {

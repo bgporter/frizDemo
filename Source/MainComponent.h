@@ -7,9 +7,8 @@
 #include "controlPanel.h"
 #include "demoComponent.h"
 
-class MainComponent
-: public juce::Component
-, public juce::ChangeListener
+class MainComponent : public juce::Component,
+                      public juce::ChangeListener
 {
 public:
     MainComponent ();
@@ -21,9 +20,9 @@ public:
     void changeListenerCallback (juce::ChangeBroadcaster* src) override;
 
 private:
-    void OpenPanel ();
+    void openPanel ();
 
-    void ClosePanel ();
+    void closePanel ();
 
 private:
     juce::ValueTree fParams;
