@@ -114,17 +114,17 @@ void MainComponent::openPanel ()
         std::make_unique<friz::EaseIn> (startX, endX, 0.4f, slew) });
 
     auto animation = std::make_unique<friz::Sequence<1>> ();
-    animation->addAnimation (std::move (clickIn));
-    animation->addAnimation (std::move (popOut));
+    animation->AddAnimation (std::move (clickIn));
+    animation->AddAnimation (std::move (popOut));
 
-    animation->onUpdate (
+    animation->OnUpdate (
         [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([=] (int /*id*/) { fPanelState = PanelState::kOpen; });
+    animation->OnCompletion ([=] (int /*id*/) { fPanelState = PanelState::kOpen; });
 
     fPanelState = PanelState::kOpening;
-    fPanelAnimator.addAnimation (std::move (animation));
+    fPanelAnimator.AddAnimation (std::move (animation));
 }
 
 void MainComponent::closePanel ()
@@ -142,12 +142,12 @@ void MainComponent::closePanel ()
     auto animation = std::make_unique<friz::Animation<1>> (
         friz::Animation<1>::SourceList { std::move (curve) }, 0);
 
-    animation->onUpdate (
+    animation->OnUpdate (
         [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([=] (int /*id*/) { fPanelState = PanelState::kClosed; });
+    animation->OnCompletion ([=] (int /*id*/) { fPanelState = PanelState::kClosed; });
 
     fPanelState = PanelState::kClosing;
-    fPanelAnimator.addAnimation (std::move (animation));
+    fPanelAnimator.AddAnimation (std::move (animation));
 }
