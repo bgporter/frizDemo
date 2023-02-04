@@ -40,12 +40,7 @@ public:
 //==============================================================================
 DemoComponent::DemoComponent (juce::ValueTree params)
 : fParams (params)
-, fAnimator (50)
-, fNextEffectId { 0 }
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
     addAndMakeVisible (fBreadcrumbs);
     fBreadcrumbs.toBack ();
 }
@@ -69,7 +64,7 @@ void DemoComponent::resized ()
 
 void DemoComponent::clear ()
 {
-    fAnimator.CancelAllAnimations (false);
+    fAnimator.cancelAllAnimations (false);
     fBoxList.clear ();
     fBreadcrumbs.clear ();
     repaint ();
@@ -137,7 +132,7 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     std::unique_ptr<friz::AnimatedValue> xCurve;
     std::unique_ptr<friz::AnimatedValue> yCurve;
 
-    int duration = fParams.getProperty (ID::kDuration, 50);
+    int duration = fParams.getProperty (ID::kDuration, 500);
 
     if (EffectType::kLinear == type)
     {
@@ -175,8 +170,8 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     }
     else if (EffectType::kSpring == type)
     {
-        auto xAccel = std::abs (endX - startX) / 50.f;
-        auto yAccel = std::abs (endY - startY) / 50.f;
+        auto xAccel = std::abs (endX - startX) / 1000.f;
+        auto yAccel = std::abs (endY - startY) / 1000.f;
 
         float tolerance = fParams.getProperty (ID::kSpringToleranceX);
         float damping   = fParams.getProperty (ID::kSpringDampingX);
@@ -219,8 +214,8 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
             friz::Animation<2>::SourceList { std::move (xCurve2), std::move (yCurve2) });
         //
         auto sequence = std::make_unique<friz::Sequence<2>> (++fNextEffectId);
-        sequence->AddAnimation (std::move (effect1));
-        sequence->AddAnimation (std::move (effect2));
+        sequence->addAnimation (std::move (effect1));
+        sequence->addAnimation (std::move (effect2));
 
         movement = std::move (sequence);
     }
@@ -230,12 +225,12 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
 
     if (EffectType::kInOut != type)
     {
-        movement->SetValue (kXpos, std::move (xCurve));
-        movement->SetValue (kYpos, std::move (yCurve));
+        movement->setValue (kXpos, std::move (xCurve));
+        movement->setValue (kYpos, std::move (yCurve));
     }
 
     // On each update: move this box to the next position on the (x,y) curve.
-    movement->OnUpdate (
+    movement->onUpdate (
         [=] (int /*id*/, const friz::Animation<2>::ValueList& val)
         {
             const auto x { static_cast<int> (val[kXpos]) };
@@ -246,7 +241,7 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
 
     // When the main animation completes: start a second animation that slowly
     // fades the color all the way out.
-    movement->OnCompletion (
+    movement->onCompletion (
         [=] (int /*id*/)
         {
             float currentSat = box->getSaturation ();
@@ -260,16 +255,16 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
                 ++fNextEffectId);
 
             // don't start fading until `delay` frames have elapsed
-            fade->SetDelay (delay);
+            fade->setDelay (delay);
 
-            fade->OnUpdate (
+            fade->onUpdate (
                 [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
                 {
                     // every update, change the saturation value of the color.
                     box->setSaturation (val[0]);
                 });
 
-            fade->OnCompletion (
+            fade->onCompletion (
                 [=] (int /*id*/)
                 {
                     // ...and when the fade animation is complete, delete the box from the
@@ -277,10 +272,10 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
                     this->deleteBox (box);
                 });
 
-            fAnimator.AddAnimation (std::move (fade));
+            fAnimator.addAnimation (std::move (fade));
         });
 
-    fAnimator.AddAnimation (std::move (movement));
+    fAnimator.addAnimation (std::move (movement));
 
     fBoxList.emplace_back (box);
 }

@@ -53,5 +53,5 @@ private:
 
     std::vector<std::unique_ptr<DemoBox>> fBoxList;
 
-    int fNextEffectId;
+    int fNextEffectId { 0 };
 };
