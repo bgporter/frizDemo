@@ -5,15 +5,19 @@
 #include "demoComponent.h"
 #include "animatorApp.h"
 
-class DemoBox : public juce::Component
+class DemoBox : public juce::Component,
+                public juce::SettableTooltipClient
 {
 public:
     DemoBox ()
+    : boxId { ++lastId }
     {
         // juce::Random r;
         auto& r { juce::Random::getSystemRandom () };
         fFill    = juce::Colour (r.nextFloat (), 0.9f, 0.9f, 0.9f);
         int size = r.nextInt ({ 50, 100 });
+        // pass clicks to the parent component.
+        // setInterceptsMouseClicks (false, false);
         setSize (size, size);
     }
 
@@ -33,13 +37,20 @@ public:
         repaint ();
     }
 
+    int getId () const { return boxId; }
+
+    juce::String getTooltip () override { return juce::String (boxId); }
+
 public:
     juce::Colour fFill;
+    inline static int lastId { 0 };
+    int boxId;
 };
 
 //==============================================================================
 DemoComponent::DemoComponent (juce::ValueTree params)
 : fParams (params)
+, tooltips (this, 100)
 {
     addAndMakeVisible (fBreadcrumbs);
     fBreadcrumbs.toBack ();
@@ -68,6 +79,21 @@ void DemoComponent::clear ()
     fBoxList.clear ();
     fBreadcrumbs.clear ();
     repaint ();
+}
+
+DemoBox* DemoComponent::findBox (int boxId)
+{
+    using ptr = std::unique_ptr<DemoBox>;
+    auto it { std::find_if (begin (fBoxList), end (fBoxList),
+                            [boxId] (const ptr& box)
+                            { return (box->getId () == boxId); }) };
+    if (it == fBoxList.end ())
+    {
+        jassertfalse;
+        return nullptr;
+    }
+
+    return it->get ();
 }
 
 void DemoComponent::mouseDown (const juce::MouseEvent& e)
@@ -112,13 +138,12 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     if (enableCrumbs != fBreadcrumbs.isEnabled ())
     {
         fBreadcrumbs.enable (enableCrumbs);
+        fBreadcrumbs.clear ();
+        repaint ();
     }
 
-    fBreadcrumbs.clear ();
-    repaint ();
-
-    auto box = new DemoBox ();
-    addAndMakeVisible (box);
+    auto box { std::make_unique<DemoBox> () };
+    addAndMakeVisible (box.get ());
     box->setBounds (startPoint.x, startPoint.y, box->getWidth (), box->getHeight ());
 
     // set the animation parameters.
@@ -127,7 +152,7 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     auto startY = static_cast<float> (startPoint.y);
     auto endY = static_cast<float> (r.nextInt ({ 0, getHeight () - box->getHeight () }));
 
-    auto movement = std::make_unique<friz::Animation<2>> (++fNextEffectId);
+    auto movement = std::make_unique<friz::Animation<2>> (box->getId ());
 
     std::unique_ptr<friz::AnimatedValue> xCurve;
     std::unique_ptr<friz::AnimatedValue> yCurve;
@@ -213,7 +238,7 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
         auto effect2 = std::make_unique<friz::Animation<2>> (
             friz::Animation<2>::SourceList { std::move (xCurve2), std::move (yCurve2) });
         //
-        auto sequence = std::make_unique<friz::Sequence<2>> (++fNextEffectId);
+        auto sequence = std::make_unique<friz::Sequence<2>> (box->getId ());
         sequence->addAnimation (std::move (effect1));
         sequence->addAnimation (std::move (effect2));
 
@@ -231,8 +256,15 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
 
     // On each update: move this box to the next position on the (x,y) curve.
     movement->onUpdate (
-        [=] (int /*id*/, const friz::Animation<2>::ValueList& val)
+        [&] (int id, const friz::Animation<2>::ValueList& val)
         {
+            auto* box { findBox (id) };
+            if (box == nullptr)
+            {
+                jassertfalse;
+                return;
+            }
+
             const auto x { static_cast<int> (val[kXpos]) };
             const auto y { static_cast<int> (val[kYpos]) };
             box->setTopLeftPosition (x, y);
@@ -242,8 +274,22 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     // When the main animation completes: start a second animation that slowly
     // fades the color all the way out.
     movement->onCompletion (
-        [=] (int /*id*/)
+        [this] (int id, bool wasCanceled)
         {
+            auto* box { findBox (id) };
+            if (box == nullptr)
+            {
+                jassertfalse;
+                return;
+            }
+
+            // if we were canceled, just delete the box; don't start the fade animation.
+            if (wasCanceled)
+            {
+                deleteBox (id);
+                return;
+            }
+
             float currentSat = box->getSaturation ();
 
             int delay = fParams.getProperty (ID::kFadeDelay);
@@ -252,37 +298,43 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
             auto fade = std::make_unique<friz::Animation<1>> (
                 friz::Animation<1>::SourceList {
                     std::make_unique<friz::Linear> (currentSat, 0.f, dur) },
-                ++fNextEffectId);
+                box->getId ());
 
             // don't start fading until `delay` frames have elapsed
             fade->setDelay (delay);
 
             fade->onUpdate (
-                [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
+                [this] (int id, const friz::Animation<1>::ValueList& val)
                 {
                     // every update, change the saturation value of the color.
-                    box->setSaturation (val[0]);
+                    if (auto* box = findBox (id); box != nullptr)
+                        box->setSaturation (val[0]);
+                    else
+                        jassertfalse;
                 });
 
             fade->onCompletion (
-                [=] (int /*id*/)
+                [this] (int id, bool /*wasCanceled*/)
                 {
                     // ...and when the fade animation is complete, delete the box from the
                     // demo component.
-                    this->deleteBox (box);
+                    this->deleteBox (id);
                 });
 
             fAnimator.addAnimation (std::move (fade));
         });
 
     fAnimator.addAnimation (std::move (movement));
-
-    fBoxList.emplace_back (box);
+    fBoxList.push_back (std::move (box));
 }
-
-void DemoComponent::deleteBox (DemoBox* box)
+bool DemoComponent::deleteBox (int boxId)
 {
+    const auto box { findBox (boxId) };
+    if (box == nullptr)
+        return false;
+    DBG ("deleting box id " << box->getId ());
     fBoxList.erase (std::remove_if (fBoxList.begin (), fBoxList.end (),
                                     [&] (const std::unique_ptr<DemoBox>& b)
                                     { return (b.get () == box); }));
+    return true;
 }

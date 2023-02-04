@@ -203,8 +203,8 @@ ControlWell::ControlWell (juce::ValueTree params)
     combo->update (); // set the combo box to the current selection.
     addControl (std::move (combo));
 
-    addControl (std::make_unique<VtLabel> (false, "Effect Duration"));
-    addControl (std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kDuration));
+    addControl (std::make_unique<VtLabel> (false, "Effect Duration (ms)"));
+    addControl (std::make_unique<VtSlider> (fTree, 50.f, 2000.f, true, ID::kDuration));
 
     addControl (std::make_unique<VtLabel> (true, "Ease In - [alt+click]"));
     addControl (std::make_unique<VtLabel> (false, "X Tolerance"));
@@ -212,13 +212,13 @@ ControlWell::ControlWell (juce::ValueTree params)
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kEaseInToleranceX));
     addControl (std::make_unique<VtLabel> (false, "X Slew"));
     addControl (
-        std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kEaseInSlewX));
+        std::make_unique<VtSlider> (fTree, 0.001f, 0.99f, false, ID::kEaseInSlewX));
     addControl (std::make_unique<VtLabel> (false, "Y Tolerance"));
     addControl (
         std::make_unique<VtSlider> (fTree, 0.01f, 5.f, false, ID::kEaseInToleranceY));
     addControl (std::make_unique<VtLabel> (false, "Y Slew"));
     addControl (
-        std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kEaseInSlewY));
+        std::make_unique<VtSlider> (fTree, 0.001f, 0.99f, false, ID::kEaseInSlewY));
 
     addControl (std::make_unique<VtLabel> (true, "Ease Out - [shift+click]"));
     addControl (std::make_unique<VtLabel> (false, "X Tolerance"));
@@ -253,11 +253,11 @@ ControlWell::ControlWell (juce::ValueTree params)
         std::make_unique<VtSlider> (fTree, 0.01f, 0.99f, false, ID::kSpringDampingY));
 
     addControl (std::make_unique<VtLabel> (true, "Fade"));
-    addControl (std::make_unique<VtLabel> (false, "Fade Delay"));
-    addControl (std::make_unique<VtSlider> (fTree, 0.f, 50 * 5.f, true, ID::kFadeDelay));
+    addControl (std::make_unique<VtLabel> (false, "Fade Delay (ms)"));
+    addControl (std::make_unique<VtSlider> (fTree, 0.f, 2500.f, true, ID::kFadeDelay));
     addControl (std::make_unique<VtLabel> (false, "Fade Duration"));
     addControl (
-        std::make_unique<VtSlider> (fTree, 10.f, 50 * 5.f, true, ID::kFadeDuration));
+        std::make_unique<VtSlider> (fTree, 100.f, 2000.f, true, ID::kFadeDuration));
 }
 
 void ControlWell::addControl (std::unique_ptr<Component> control)

@@ -41,17 +41,20 @@ public:
     void clear ();
 
 private:
-    void deleteBox (DemoBox* box);
+    DemoBox* findBox (int boxId);
+
+    bool deleteBox (int boxId);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DemoComponent)
 
     juce::ValueTree fParams;
+    juce::TooltipWindow tooltips;
 
     friz::Animator fAnimator;
     Breadcrumbs fBreadcrumbs;
 
     std::vector<std::unique_ptr<DemoBox>> fBoxList;
 
-    int fNextEffectId { 0 };
+    // int fNextEffectId { 0 };
 };

@@ -112,6 +112,8 @@ void MainComponent::openPanel ()
 
     auto popOut = std::make_unique<friz::Animation<1>> (friz::Animation<1>::SourceList {
         std::make_unique<friz::EaseIn> (startX, endX, 0.4f, slew) });
+    // wait ~75ms before popping out.
+    popOut->setDelay (75);
 
     auto animation = std::make_unique<friz::Sequence<1>> ();
     animation->addAnimation (std::move (clickIn));
@@ -121,7 +123,8 @@ void MainComponent::openPanel ()
         [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([=] (int /*id*/) { fPanelState = PanelState::kOpen; });
+    animation->onCompletion ([=] (int /*id*/, bool /*wasCanceled*/)
+                             { fPanelState = PanelState::kOpen; });
 
     fPanelState = PanelState::kOpening;
     fPanelAnimator.addAnimation (std::move (animation));
@@ -135,8 +138,8 @@ void MainComponent::closePanel ()
     const auto startX = static_cast<float> (fControls->getX ());
     const auto endX   = static_cast<float> (width - kClosedPanelWidth);
 
-    float accel  = 0.001f;
-    float dampen = 0.9f;
+    float accel  = 0.04f;
+    float dampen = 0.99f;
 
     auto curve     = std::make_unique<friz::Spring> (startX, endX, 0.5f, accel, dampen);
     auto animation = std::make_unique<friz::Animation<1>> (
@@ -146,7 +149,8 @@ void MainComponent::closePanel ()
         [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([=] (int /*id*/) { fPanelState = PanelState::kClosed; });
+    animation->onCompletion ([=] (int /*id*/, bool /*wasCanceled*/)
+                             { fPanelState = PanelState::kClosed; });
 
     fPanelState = PanelState::kClosing;
     fPanelAnimator.addAnimation (std::move (animation));
