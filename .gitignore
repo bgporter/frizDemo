@@ -4,6 +4,8 @@
 # - don't stry to store the generated output docs
 doxygen/docs/
 
+### VS Code config 
+.vscode/
 
 # Created by https://www.gitignore.io/api/xcode,c++,visualstudio
 
@@ -17,6 +19,7 @@ build/
 DerivedData/
 Builds/
 .DS_Store
+JuceLibraryCode/
 
 ## Various settings
 *.pbxuser
