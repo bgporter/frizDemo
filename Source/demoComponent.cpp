@@ -291,7 +291,7 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
 
     // On each update: move this box to the next position on the (x,y) curve.
     movement->onUpdate (
-        [&] (int id, const friz::Animation<2>::ValueList& val)
+        [this, kXpos, kYpos] (int id, const friz::Animation<2>::ValueList& val)
         {
             auto* box { findBox (id) };
             if (box == nullptr)
