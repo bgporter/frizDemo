@@ -1,6 +1,24 @@
 /*
- * Copyright (c) 2019 Brett g Porter.
- */
+    Copyright (c) 2019-2023 Brett g Porter
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
 
 #include "controlPanel.h"
 
@@ -46,7 +64,7 @@ VtSlider::VtSlider (juce::ValueTree tree, float min, float max, bool isInt,
     addAndMakeVisible (fSlider.get ());
     fSlider->setRange (min, max, isInt ? 1 : 0);
     fSlider->setSliderStyle (juce::Slider::LinearHorizontal);
-    fSlider->setNumDecimalPlacesToDisplay (3);
+    fSlider->setNumDecimalPlacesToDisplay (isInt ? 0 : 3);
     fSlider->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     fSlider->addListener (this);
 
@@ -204,7 +222,7 @@ ControlWell::ControlWell (juce::ValueTree params)
     addControl (std::move (combo));
 
     addControl (std::make_unique<VtLabel> (false, "Effect Duration (ms)"));
-    addControl (std::make_unique<VtSlider> (fTree, 50.f, 2000.f, true, ID::kDuration));
+    addControl (std::make_unique<VtSlider> (fTree, 10.f, 2000.f, true, ID::kDuration));
 
     addControl (std::make_unique<VtLabel> (true, "Ease In - [alt+click]"));
     addControl (std::make_unique<VtLabel> (false, "X Tolerance"));
@@ -256,8 +274,7 @@ ControlWell::ControlWell (juce::ValueTree params)
     addControl (std::make_unique<VtLabel> (false, "Fade Delay (ms)"));
     addControl (std::make_unique<VtSlider> (fTree, 0.f, 2500.f, true, ID::kFadeDelay));
     addControl (std::make_unique<VtLabel> (false, "Fade Duration"));
-    addControl (
-        std::make_unique<VtSlider> (fTree, 100.f, 2000.f, true, ID::kFadeDuration));
+    addControl (std::make_unique<VtSlider> (fTree, 0.f, 2000.f, true, ID::kFadeDuration));
 }
 
 void ControlWell::addControl (std::unique_ptr<Component> control)

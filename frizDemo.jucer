@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="rth6tE" name="frizDemo" projectType="guiapp" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="2.0.0">
   <MAINGROUP id="nlEj2r" name="frizDemo">
     <GROUP id="{AE7C80F4-9F1E-68F6-65E4-9BCD764FA2E6}" name="Source">
       <GROUP id="{F228A17D-7B9F-D4C6-CEF3-F33F50327A36}" name="assets">
@@ -25,7 +25,7 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <VS2022 targetFolder="Builds/VisualStudio2022">
+    <VS2022 targetFolder="Builds/VisualStudio2022" smallIcon="dTmp28" bigIcon="dTmp28">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="frizDemo"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="frizDemo"/>
@@ -39,7 +39,7 @@
         <MODULEPATH id="friz" path="submodules/animator/Source"/>
       </MODULEPATHS>
     </VS2022>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="dTmp28" bigIcon="dTmp28">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="frizDemo"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="frizDemo"/>

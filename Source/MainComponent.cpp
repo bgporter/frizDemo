@@ -1,6 +1,24 @@
 /*
- * Copyright (c) 2019 Brett g Porter.
- */
+    Copyright (c) 2019-2023 Brett g Porter
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
 
 #include "MainComponent.h"
 
@@ -17,7 +35,7 @@ MainComponent::MainComponent ()
 , fPanelState (PanelState::kOpen)
 {
     fParams.setProperty (ID::kBreadcrumbs, true, nullptr);
-    fParams.setProperty (ID::kDuration, 50, nullptr);
+    fParams.setProperty (ID::kDuration, 500, nullptr);
     fParams.setProperty (ID::kEaseOutToleranceX, 0.6f, nullptr);
     fParams.setProperty (ID::kEaseOutToleranceY, 0.6f, nullptr);
     fParams.setProperty (ID::kEaseOutSlewX, 1.2f, nullptr);
@@ -32,12 +50,12 @@ MainComponent::MainComponent ()
     fParams.setProperty (ID::kSpringToleranceX, 0.5f, nullptr);
     fParams.setProperty (ID::kSpringToleranceY, 0.5f, nullptr);
 
-    fParams.setProperty (ID::kFadeDelay, 50, nullptr);
-    fParams.setProperty (ID::kFadeDuration, 150, nullptr);
+    fParams.setProperty (ID::kFadeDelay, 1000, nullptr);
+    fParams.setProperty (ID::kFadeDuration, 1000, nullptr);
 
     addAndMakeVisible (fStage);
 
-    fControls.reset (new ControlPanel (fParams));
+    fControls = std::make_unique<ControlPanel> (fParams);
 
     addAndMakeVisible (fControls.get ());
     fControls->addChangeListener (this);
@@ -66,11 +84,11 @@ void MainComponent::resized ()
     if (fPanelState != PanelState::kClosing || fPanelState != kOpening)
     {
         // handwave past the possibility of resizing while the panel is moving.
-        int panelWidth = kOpenPanelWidth;
-        int showing =
+        const int panelWidth = kOpenPanelWidth;
+        const int showing =
             (PanelState::kClosed == fPanelState) ? kClosedPanelWidth : panelWidth;
 
-        int xPos = bounds.getWidth () - showing;
+        const int xPos = bounds.getWidth () - showing;
         fControls->setBounds (xPos, 0, kOpenPanelWidth, bounds.getHeight ());
     }
 }
@@ -81,13 +99,9 @@ void MainComponent::changeListenerCallback (juce::ChangeBroadcaster* src)
     {
         // user clicked on panel -- open or close it.
         if (PanelState::kOpen == fPanelState)
-        {
             closePanel ();
-        }
         else if (PanelState::kClosed == fPanelState)
-        {
             openPanel ();
-        }
         // else, we're already in motion, do nothing.
     }
 }
@@ -120,10 +134,10 @@ void MainComponent::openPanel ()
     animation->addAnimation (std::move (popOut));
 
     animation->onUpdate (
-        [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
+        [this] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([=] (int /*id*/, bool /*wasCanceled*/)
+    animation->onCompletion ([this] (int /*id*/, bool /*wasCanceled*/)
                              { fPanelState = PanelState::kOpen; });
 
     fPanelState = PanelState::kOpening;
@@ -146,10 +160,10 @@ void MainComponent::closePanel ()
         friz::Animation<1>::SourceList { std::move (curve) }, 0);
 
     animation->onUpdate (
-        [=] (int /*id*/, const friz::Animation<1>::ValueList& val)
+        [this] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([=] (int /*id*/, bool /*wasCanceled*/)
+    animation->onCompletion ([this] (int /*id*/, bool /*wasCanceled*/)
                              { fPanelState = PanelState::kClosed; });
 
     fPanelState = PanelState::kClosing;

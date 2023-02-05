@@ -1,6 +1,24 @@
 /*
- * Copyright (c) 2019 Brett g Porter.
- */
+    Copyright (c) 2019-2023 Brett g Porter
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
 
 #include "demoComponent.h"
 #include "animatorApp.h"
@@ -52,12 +70,23 @@ DemoComponent::DemoComponent (juce::ValueTree params)
 : fParams (params)
 , tooltips (this, 100)
 {
+    // test the blank controller:
+    fAnimator.setController (std::make_unique<friz::DisplaySyncController> (this));
+
     addAndMakeVisible (fBreadcrumbs);
     fBreadcrumbs.toBack ();
+
+    addAndMakeVisible (frameRate);
+    frameRate.setFont (juce::Font (18.f));
+    frameRate.setColour (juce::Label::textColourId, juce::Colours::black);
+    frameRate.setAlwaysOnTop (true);
+
+    startTimerHz (4);
 }
 
 DemoComponent::~DemoComponent ()
 {
+    stopTimer ();
     clear ();
 }
 
@@ -71,6 +100,7 @@ void DemoComponent::paint (juce::Graphics& g)
 void DemoComponent::resized ()
 {
     fBreadcrumbs.setBounds (getLocalBounds ());
+    frameRate.setBounds (5, 5, 200, 18);
 }
 
 void DemoComponent::clear ()
@@ -128,6 +158,11 @@ void DemoComponent::mouseDown (const juce::MouseEvent& e)
 
         createDemo (e.getPosition (), type);
     }
+}
+
+void DemoComponent::timerCallback ()
+{
+    updateRate ();
 }
 
 void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
@@ -332,9 +367,20 @@ bool DemoComponent::deleteBox (int boxId)
     const auto box { findBox (boxId) };
     if (box == nullptr)
         return false;
-    DBG ("deleting box id " << box->getId ());
     fBoxList.erase (std::remove_if (fBoxList.begin (), fBoxList.end (),
                                     [&] (const std::unique_ptr<DemoBox>& b)
                                     { return (b.get () == box); }));
     return true;
+}
+
+void DemoComponent::updateRate ()
+{
+    auto controller { fAnimator.getController () };
+    if (controller == nullptr)
+    {
+        jassertfalse;
+        return;
+    }
+    auto rateTxt { juce::String (controller->getFrameRate (), 1) + " fps " };
+    frameRate.setText (rateTxt, juce::NotificationType::dontSendNotification);
 }
