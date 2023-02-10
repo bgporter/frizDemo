@@ -329,32 +329,33 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
 
             int delay = fParams.getProperty (ID::kFadeDelay);
             int dur   = fParams.getProperty (ID::kFadeDuration);
-
+#define NEW_STYLE 1
+#if NEW_STYLE
+            auto fade = friz::makeAnimation<friz::Linear>(box->getId(), currentSat, 0.f, dur);
+#else
             auto fade = std::make_unique<friz::Animation<1>> (
                 friz::Animation<1>::SourceList {
                     std::make_unique<friz::Linear> (currentSat, 0.f, dur) },
                 box->getId ());
-
+#endif
             // don't start fading until `delay` frames have elapsed
             fade->setDelay (delay);
 
-            fade->onUpdate (
-                [this] (int id, const friz::Animation<1>::ValueList& val)
+            fade->updateFn =  [this] (int id, const friz::Animation<1>::ValueList& val)
                 {
                     // every update, change the saturation value of the color.
                     if (auto* box = findBox (id); box != nullptr)
                         box->setSaturation (val[0]);
                     else
                         jassertfalse;
-                });
+                };
 
-            fade->onCompletion (
-                [this] (int id, bool /*wasCanceled*/)
+            fade->completionFn = [this] (int id, bool /*wasCanceled*/)
                 {
                     // ...and when the fade animation is complete, delete the box from the
                     // demo component.
-                    this->deleteBox (id);
-                });
+                    deleteBox (id);
+                };
 
             fAnimator.addAnimation (std::move (fade));
         });
