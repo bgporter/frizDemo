@@ -121,7 +121,8 @@ void MainComponent::openPanel ()
     // add a quick anticipation effect; when the mouse clicks on us, we
     // go 'inward' before popping out, like there's the other part of the spring
     // we bounds against when the panel is closed.
-    auto clickIn = friz::makeAnimation<friz::EaseIn>(0, startX, startX + 10.f, 0.05f, 0.07f);
+    auto clickIn =
+        friz::makeAnimation<friz::EaseIn> (0, startX, startX + 10.f, 0.05f, 0.07f);
     auto popOut = friz::makeAnimation<friz::EaseIn> (0, startX, endX, 0.4f, slew);
 
     // wait ~75ms before popping out.
@@ -136,7 +137,7 @@ void MainComponent::openPanel ()
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
     sequence->onCompletion ([this] (int /*id*/, bool /*wasCanceled*/)
-                             { fPanelState = PanelState::kOpen; });
+                            { fPanelState = PanelState::kOpen; });
 
     fPanelState = PanelState::kOpening;
     fPanelAnimator.addAnimation (std::move (sequence));
@@ -153,12 +154,12 @@ void MainComponent::closePanel ()
     float accel  = 0.04f;
     float dampen = 0.99f;
 
-    auto curve     = std::make_unique<friz::Spring> (startX, endX, 0.5f, accel, dampen);
+    auto curve     = std::make_unique<friz::Spring> (startX, endX, 0.05f, accel, dampen);
     auto animation = std::make_unique<friz::Animation<1>> (
         friz::Animation<1>::SourceList { std::move (curve) }, 0);
 
     animation->onUpdate (
-        [this] (int /*id*/, const friz::Animation<1>::ValueList& val)
+        [this] (int /*id*/, const auto& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
     animation->onCompletion ([this] (int /*id*/, bool /*wasCanceled*/)
