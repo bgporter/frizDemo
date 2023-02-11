@@ -34,8 +34,6 @@ public:
         auto& r { juce::Random::getSystemRandom () };
         fFill    = juce::Colour (r.nextFloat (), 0.9f, 0.9f, 0.9f);
         int size = r.nextInt ({ 50, 100 });
-        // pass clicks to the parent component.
-        // setInterceptsMouseClicks (false, false);
         setSize (size, size);
     }
 
@@ -187,7 +185,8 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     auto startY = static_cast<float> (startPoint.y);
     auto endY = static_cast<float> (r.nextInt ({ 0, getHeight () - box->getHeight () }));
 
-    auto movement = std::make_unique<friz::Animation<2>> (box->getId ());
+    std::unique_ptr<friz::AnimationType> movement =
+        std::make_unique<friz::Animation<2>> (box->getId ());
 
     std::unique_ptr<friz::AnimatedValue> xCurve;
     std::unique_ptr<friz::AnimatedValue> yCurve;
@@ -290,79 +289,61 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     }
 
     // On each update: move this box to the next position on the (x,y) curve.
-    movement->onUpdate (
-        [this, kXpos, kYpos] (int id, const friz::Animation<2>::ValueList& val)
-        {
-            auto* box { findBox (id) };
-            if (box == nullptr)
+    if (auto updater = dynamic_cast<friz::UpdateSource<2>*> (movement.get ()))
+    {
+        updater->onUpdate (
+            [this, kXpos, kYpos] (int id, const friz::Animation<2>::ValueList& val)
             {
-                jassertfalse;
-                return;
-            }
-
-            const auto x { static_cast<int> (val[kXpos]) };
-            const auto y { static_cast<int> (val[kYpos]) };
-            box->setTopLeftPosition (x, y);
-            fBreadcrumbs.addPoint (val[kXpos], val[kYpos]);
-        });
-
-    // When the main animation completes: start a second animation that slowly
-    // fades the color all the way out.
-    movement->onCompletion (
-        [this] (int id, bool wasCanceled)
-        {
-            auto* box { findBox (id) };
-            if (box == nullptr)
-            {
-                jassertfalse;
-                return;
-            }
-
-            // if we were canceled, just delete the box; don't start the fade animation.
-            if (wasCanceled)
-            {
-                deleteBox (id);
-                return;
-            }
-
-            float currentSat = box->getSaturation ();
-
-            int delay = fParams.getProperty (ID::kFadeDelay);
-            int dur   = fParams.getProperty (ID::kFadeDuration);
-#define NEW_STYLE 1
-#if NEW_STYLE
-            auto fade = friz::makeAnimation<friz::Linear>(box->getId(), currentSat, 0.f, dur);
-#else
-            auto fade = std::make_unique<friz::Animation<1>> (
-                friz::Animation<1>::SourceList {
-                    std::make_unique<friz::Linear> (currentSat, 0.f, dur) },
-                box->getId ());
-#endif
-            // don't start fading until `delay` frames have elapsed
-            fade->setDelay (delay);
-
-            fade->updateFn =  [this] (int id, const friz::Animation<1>::ValueList& val)
+                auto* box { findBox (id) };
+                if (box == nullptr)
                 {
-                    // every update, change the saturation value of the color.
-                    if (auto* box = findBox (id); box != nullptr)
-                        box->setSaturation (val[0]);
-                    else
-                        jassertfalse;
-                };
+                    jassertfalse;
+                    return;
+                }
 
-            fade->completionFn = [this] (int id, bool /*wasCanceled*/)
-                {
-                    // ...and when the fade animation is complete, delete the box from the
-                    // demo component.
-                    deleteBox (id);
-                };
+                const auto x { static_cast<int> (val[kXpos]) };
+                const auto y { static_cast<int> (val[kYpos]) };
+                box->setTopLeftPosition (x, y);
+                fBreadcrumbs.addPoint (val[kXpos], val[kYpos]);
+            });
+    }
 
-            fAnimator.addAnimation (std::move (fade));
-        });
+    // Second effect: After the movement is complete, fade the box to white and then
+    // delete it.
+    float currentSat = box->getSaturation ();
 
-    fAnimator.addAnimation (std::move (movement));
+    int delay = fParams.getProperty (ID::kFadeDelay);
+    int dur   = fParams.getProperty (ID::kFadeDuration);
+    auto fade = friz::makeAnimation<friz::Linear> (box->getId (), currentSat, 0.f, dur);
+    // don't start fading until `delay` frames have elapsed
+    fade->setDelay (delay);
+
+    fade->updateFn = [this] (int id, const friz::Animation<1>::ValueList& val)
+    {
+        // every update, change the saturation value of the color.
+        if (auto* box = findBox (id); box != nullptr)
+            box->setSaturation (val[0]);
+        else
+            jassertfalse;
+    };
+
+    fade->completionFn = [this] (int id, bool /*wasCanceled*/)
+    {
+        // ...and when the fade animation is complete, delete the box from the
+        // demo component.
+        deleteBox (id);
+    };
+
+    // create a Chain to connect the animations together in order.
+    auto chain = std::make_unique<friz::Chain> (box->getId ());
+    chain->addAnimation (std::move (movement));
+    chain->addAnimation (std::move (fade));
+
+    fAnimator.addAnimation (std::move (chain));
+
     fBoxList.push_back (std::move (box));
 }
+
 bool DemoComponent::deleteBox (int boxId)
 {
     const auto box { findBox (boxId) };

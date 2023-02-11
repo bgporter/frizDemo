@@ -121,32 +121,25 @@ void MainComponent::openPanel ()
     // add a quick anticipation effect; when the mouse clicks on us, we
     // go 'inward' before popping out, like there's the other part of the spring
     // we bounds against when the panel is closed.
-#if OLD_STYLE
-    auto clickIn = std::make_unique<friz::Animation<1>> (
-        fx { std::make_unique<friz::EaseIn> (startX, startX + 10.f, 0.05f, 0.07f) });
-
-    auto popOut = std::make_unique<friz::Animation<1>> (friz::Animation<1>::SourceList {
-        std::make_unique<friz::EaseIn> (startX, endX, 0.4f, slew) });
-#else
     auto clickIn = friz::makeAnimation<friz::EaseIn>(0, startX, startX + 10.f, 0.05f, 0.07f);
     auto popOut = friz::makeAnimation<friz::EaseIn> (0, startX, endX, 0.4f, slew);
-#endif
+
     // wait ~75ms before popping out.
     popOut->setDelay (75);
 
-    auto animation = std::make_unique<friz::Sequence<1>> ();
-    animation->addAnimation (std::move (clickIn));
-    animation->addAnimation (std::move (popOut));
+    auto sequence = std::make_unique<friz::Sequence<1>> ();
+    sequence->addAnimation (std::move (clickIn));
+    sequence->addAnimation (std::move (popOut));
 
-    animation->onUpdate (
+    sequence->onUpdate (
         [this] (int /*id*/, const friz::Animation<1>::ValueList& val)
         { fControls->setTopLeftPosition (static_cast<int> (val[0]), 0); });
 
-    animation->onCompletion ([this] (int /*id*/, bool /*wasCanceled*/)
+    sequence->onCompletion ([this] (int /*id*/, bool /*wasCanceled*/)
                              { fPanelState = PanelState::kOpen; });
 
     fPanelState = PanelState::kOpening;
-    fPanelAnimator.addAnimation (std::move (animation));
+    fPanelAnimator.addAnimation (std::move (sequence));
 }
 
 void MainComponent::closePanel ()
