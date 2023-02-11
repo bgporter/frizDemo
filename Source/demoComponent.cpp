@@ -202,10 +202,8 @@ void DemoComponent::createDemo (juce::Point<int> startPoint, EffectType type)
     {
         int curveType =
             fParams.getProperty (ID::kCurve, friz::Parametric::CurveType::kLinear);
-        xCurve = std::make_unique<friz::Parametric> (
-            friz::Parametric::CurveType (curveType), startX, endX, duration);
-        yCurve = std::make_unique<friz::Parametric> (
-            friz::Parametric::CurveType (curveType), startY, endY, duration);
+        xCurve = std::make_unique<friz::Parametric> (startX, endX, duration, friz::Parametric::CurveType (curveType));
+        yCurve = std::make_unique<friz::Parametric> (startY, endY, duration, friz::Parametric::CurveType (curveType));
     }
     else if (EffectType::kEaseOut == type)
     {
