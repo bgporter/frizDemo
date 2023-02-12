@@ -68,9 +68,11 @@ DemoComponent::DemoComponent (juce::ValueTree params)
 : fParams (params)
 , tooltips (this, 100)
 {
+#if FRIZ_VBLANK_ENABLED
     // test the blank controller:
     fAnimator.setController (std::make_unique<friz::DisplaySyncController> (this));
-
+#endif
+    
     addAndMakeVisible (fBreadcrumbs);
     fBreadcrumbs.toBack ();
 
